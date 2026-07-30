@@ -201,12 +201,12 @@ def track_record(label: str) -> str | None:
         return n, (h / n * 100 if n else 0)
     if label.startswith("Put-heavy"):
         n, fell = pooled("bearish")
-        return (f"5-year test ({n:,} similar setups): price actually FELL only {fell:.0f}% "
+        return (f"Historical test ({n:,} similar setups): price actually FELL only {fell:.0f}% "
                 f"of the time — it rose more often than not. No predictive edge found; "
                 f"read this as where traders are positioned, not where price will go.")
     if label.startswith("Call-heavy"):
         n, rose = pooled("bullish")
-        return (f"5-year test ({n:,} similar setups): price rose {rose:.0f}% of the time — "
+        return (f"Historical test ({n:,} similar setups): price rose {rose:.0f}% of the time — "
                 f"but any stock on any day rose {base_up:.0f}% of the time. No added edge; "
                 f"read this as positioning, not a prediction.")
     return None

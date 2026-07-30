@@ -155,6 +155,19 @@ def main():
         log.info("signal backtest refreshed")
     except Exception as e:
         log.warning("backtest skipped: %s", e)
+
+    # keep the file under GitHub's 100 MB limit, or nightly pushes start failing
+    try:
+        import prune_db
+        removed = prune_db.prune(con, verbose=False)
+        size = DB_PATH.stat().st_size / 1048576
+        if size > 70:
+            con.execute("VACUUM")
+            size = DB_PATH.stat().st_size / 1048576
+        log.info("pruned %d old rows; database now %.1f MB", removed, size)
+    except Exception as e:
+        log.warning("prune skipped: %s", e)
+
     log.info("done. database: %s", DB_PATH)
 
 
