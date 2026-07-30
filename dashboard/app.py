@@ -71,9 +71,34 @@ st.markdown("""
 
 # ---------- data ----------
 
+def db_stamp():
+    """Changes whenever the nightly job pushes an updated database."""
+    try:
+        s = DB.stat()
+        return (s.st_mtime_ns, s.st_size)
+    except OSError:
+        return (0, 0)
+
+
 @st.cache_resource
-def get_con():
+def _connect(stamp):
+    # stamp is part of the cache key: a new database file means a new connection,
+    # otherwise the old file handle keeps serving yesterday's data forever.
     return sqlite3.connect(DB, check_same_thread=False)
+
+
+@st.cache_resource
+def _stamp_holder():
+    return {"seen": None}
+
+
+def get_con():
+    stamp = db_stamp()
+    holder = _stamp_holder()
+    if holder["seen"] != stamp:
+        st.cache_data.clear()   # drop cached charts/queries built from the old file
+        holder["seen"] = stamp
+    return _connect(stamp)
 
 
 def parse_portfolio_text() -> dict[str, int]:
